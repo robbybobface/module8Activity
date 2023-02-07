@@ -1,4 +1,4 @@
-import { remoteDelete, remoteGet, remotePost } from './remoteService';
+import { remoteDelete, remoteGet, remotePost, remotePut } from './remoteService';
 import { Course, Grade, StudentID, Transcript, TranscriptManager } from '../types/transcript';
 
 import { Promisify } from '../types/promise-utils';
@@ -62,6 +62,16 @@ export async function getGrade(studentID: StudentID, course: Course): Promise<Gr
 // * GET /transcripts     -- returns list of all transcripts
 export async function getAllTranscripts(): Promise<Transcript[]> {
   return remoteGet<Transcript[]>('/transcripts');
+}
+
+// * PUT /transcripts -- Updates the transcript for a given student and course.
+export async function updateTranscripts(
+  studentID: StudentID,
+  course: Course,
+  newGrade: number,
+): Promise<void> {
+  console.log(`Updating transcript for student ${studentID} in course ${course} to ${newGrade}`);
+  await remotePut<void>(`/transcripts/${studentID}/${course}`, { grade: newGrade });
 }
 
 export async function uploadTranscript(tr: Transcript): Promise<unknown> {

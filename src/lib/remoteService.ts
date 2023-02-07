@@ -23,3 +23,9 @@ export async function remotePost<T>(path: string, data?: any): Promise<T> {
   const response: AxiosResponse<T> = await axios.post(path, data);
   return response.data;
 }
+
+// Need to update the function
+export async function remotePut<T>(path: string, data?: any): Promise<T> {
+  const response: AxiosResponse<T> = await axios.put(path, data);
+  return response.data;
+}

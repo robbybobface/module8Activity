@@ -18,13 +18,14 @@ import './App.css';
 import { NewGradeForm } from './components/NewGradeForm';
 import { NewStudentForm } from './components/NewStudentForm';
 import { TranscriptView } from './components/TranscriptView';
-import { averageGrade, getAllTranscripts } from './lib/client';
+import { getAllTranscripts } from './lib/client';
 import { Transcript } from './types/transcript';
 
 const ITEMS_PER_PAGE = 20;
 
 function App() {
   const [transcripts, setTranscripts] = useState<Transcript[]>([]);
+  const [transcriptsToView, setTranscriptsToView] = useState<Transcript[]>([]);
   const [pageNumber, setPageNumber] = useState<string>('1');
   const [sortType, setSortType] = useState<string>('');
   const [sortOrder, setSortOrder] = useState<boolean>(true);
@@ -36,8 +37,9 @@ function App() {
     fetchTranscripts();
   }, []);
 
-  const startIndex = 0 + ITEMS_PER_PAGE * parseInt(pageNumber) - 1;
-  const endIndex = ITEMS_PER_PAGE + ITEMS_PER_PAGE * parseInt(pageNumber) - 1;
+  // Fixed the pagination, it was incorrect before and was not displaying the first page
+  const startIndex = 0 + ITEMS_PER_PAGE * (parseInt(pageNumber) - 1);
+  const endIndex = ITEMS_PER_PAGE + ITEMS_PER_PAGE * (parseInt(pageNumber) - 1);
 
   const handlePageNumber = (newValue: string) => {
     const parsed: number | undefined = parseInt(newValue);
@@ -48,40 +50,66 @@ function App() {
     }
   };
 
+  const sortByID = (a: Transcript, b: Transcript, orderType: boolean) => {
+    if (a.student.studentID < b.student.studentID) {
+      return orderType ? -1 : 1;
+    }
+    if (a.student.studentID > b.student.studentID) {
+      return orderType ? 1 : -1;
+    }
+    return 0;
+  };
+
+  const averageGrade = (a: Transcript): number => {
+    return a.grades.reduce((avg, value, _, { length }) => {
+      return avg + value.grade / length;
+    }, 0);
+  };
+
+  const sortByGrade = (a: Transcript, b: Transcript, orderType: boolean) => {
+    if (averageGrade(a) < averageGrade(b)) {
+      return orderType ? -1 : 1;
+    }
+    if (averageGrade(a) > averageGrade(b)) {
+      return orderType ? 1 : -1;
+    }
+    return 0;
+  };
+
+  const sortByName = (a: Transcript, b: Transcript, orderType: boolean) => {
+    if (a.student.studentName < b.student.studentName) {
+      return orderType ? -1 : 1;
+    }
+    if (a.student.studentName > b.student.studentName) {
+      return orderType ? 1 : -1;
+    }
+    return 0;
+  };
+
+  const resortTranscripts = () => {
+    switch (sortType) {
+      case 'id': {
+        const newTranscriptsID = transcripts.sort((a, b) => sortByID(a, b, sortOrder));
+        setTranscriptsToView(newTranscriptsID.slice(startIndex, endIndex));
+        break;
+      }
+      case 'name': {
+        const newTranscriptsName = transcripts.sort((a, b) => sortByName(a, b, sortOrder));
+        setTranscriptsToView(newTranscriptsName.slice(startIndex, endIndex));
+        break;
+      }
+      case 'average': {
+        const newTranscriptsGrade = transcripts.sort((a, b) => sortByGrade(a, b, sortOrder));
+        setTranscriptsToView(newTranscriptsGrade.slice(startIndex, endIndex));
+        break;
+      }
+      default:
+        setTranscriptsToView(transcripts.slice(startIndex, endIndex));
+        break;
+    }
+  };
+
   useEffect(() => {
-    const sortByID = (a: Transcript, b: Transcript, orderType: boolean) => {
-      if (a.student.studentID < b.student.studentID) {
-        return orderType ? -1 : 1;
-      }
-      if (a.student.studentID > b.student.studentID) {
-        return orderType ? 1 : -1;
-      }
-      return 0;
-    };
-
-    const avgGrade = (a: Transcript): number => {
-      return a.grades.reduce((acc, curr) => acc + curr.grade, 0) / a.grades.length;
-    };
-
-    const sortByGrade = (a: Transcript, b: Transcript, orderType: boolean) => {
-      if (avgGrade(a) < avgGrade(b)) {
-        return orderType ? -1 : 1;
-      }
-      if (avgGrade(a) > avgGrade(b)) {
-        return orderType ? 1 : -1;
-      }
-      return 0;
-    };
-
-    const sortByName = (a: Transcript, b: Transcript, orderType: boolean) => {
-      if (a.student.studentName < b.student.studentName) {
-        return orderType ? -1 : 1;
-      }
-      if (a.student.studentName > b.student.studentName) {
-        return orderType ? 1 : -1;
-      }
-      return 0;
-    };
     switch (sortType) {
       case 'id': {
         const newTranscriptsID = [...transcripts].sort((a, b) => sortByID(a, b, sortOrder));
@@ -95,17 +123,25 @@ function App() {
       }
       case 'average': {
         const newTranscriptsAverage = [...transcripts].sort((a, b) => sortByGrade(a, b, sortOrder));
+        console.log(newTranscriptsAverage.slice(0, 20));
         setTranscripts(newTranscriptsAverage);
         break;
       }
       default:
         break;
     }
-  }, [sortType, sortOrder, transcripts]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sortType, sortOrder, pageNumber]);
 
-  const transcriptView = transcripts.slice(startIndex, endIndex).map(eachTranscript => (
+  useEffect(() => {
+    resortTranscripts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [transcripts, pageNumber]);
+
+  // console.log('rerender');
+  const transcriptView = transcriptsToView.map(eachTranscript => (
     <WrapItem key={eachTranscript.student.studentID}>
-      <TranscriptView transcript={eachTranscript} />
+      <TranscriptView transcript={eachTranscript} stateChanger={setTranscripts} />
     </WrapItem>
   ));
 
@@ -138,8 +174,8 @@ function App() {
               </Select>
             </div>
           </GridItem>
-          <NewStudentForm />
-          <NewGradeForm />
+          <NewStudentForm stateChanger={setTranscripts} />
+          <NewGradeForm stateChanger={setTranscripts} />
         </Grid>
         <br />
         <Tag>Page #</Tag>

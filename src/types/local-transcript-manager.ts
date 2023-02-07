@@ -84,11 +84,13 @@ export function addGrade(studentID: StudentID, course: Course, grade: number): v
 }
 
 export function updateTranscripts(studentID: StudentID, course: Course, newGrade: number): void {
+  console.log(getTranscript(studentID));
   const tIndex = allTranscripts.findIndex(t => t.student.studentID === studentID);
   if (tIndex === -1) {
     throw new Error(`no student with ID = ${studentID}`);
   }
   const theTranscript = allTranscripts[tIndex];
+  console.log(theTranscript);
   const newTranscript = {
     student: theTranscript.student,
     grades: theTranscript.grades.map(g => {

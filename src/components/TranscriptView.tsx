@@ -1,9 +1,15 @@
-import React from 'react';
+import React, { Dispatch, SetStateAction } from 'react';
 import { ListItem, HStack, Tag, Badge } from '@chakra-ui/react';
 import { Transcript } from '../types/transcript';
 import { GradeView } from './GradeView';
 
-export function TranscriptView({ transcript }: { transcript: Transcript }) {
+export function TranscriptView({
+  transcript,
+  stateChanger,
+}: {
+  transcript: Transcript;
+  stateChanger: Dispatch<SetStateAction<Transcript[]>>;
+}) {
   return (
     <ListItem>
       <HStack spacing='12px'>
@@ -13,7 +19,12 @@ export function TranscriptView({ transcript }: { transcript: Transcript }) {
         </Badge>
 
         {transcript.grades.map((eachGrade, eachGradeIndex) => (
-          <GradeView key={eachGradeIndex} grade={eachGrade} student={transcript.student} />
+          <GradeView
+            key={eachGradeIndex}
+            grade={eachGrade}
+            student={transcript.student}
+            stateChanger={stateChanger}
+          />
         ))}
       </HStack>
     </ListItem>

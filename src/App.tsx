@@ -141,7 +141,7 @@ function App() {
   // console.log('rerender');
   const transcriptView = transcriptsToView.map(eachTranscript => (
     <WrapItem key={eachTranscript.student.studentID}>
-      <TranscriptView transcript={eachTranscript} stateChanger={setTranscripts} />
+      <TranscriptView transcript={eachTranscript} transcriptsChanger={setTranscripts} />
     </WrapItem>
   ));
 
@@ -174,8 +174,8 @@ function App() {
               </Select>
             </div>
           </GridItem>
-          <NewStudentForm stateChanger={setTranscripts} />
-          <NewGradeForm stateChanger={setTranscripts} />
+          <NewStudentForm transcriptsChanger={setTranscripts} />
+          <NewGradeForm transcriptsChanger={setTranscripts} />
         </Grid>
         <br />
         <Tag>Page #</Tag>

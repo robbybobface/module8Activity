@@ -4,9 +4,9 @@ import { Transcript } from '../types/transcript';
 import { addStudent } from '../lib/client';
 
 export function NewStudentForm({
-  stateChanger,
+  transcriptsChanger,
 }: {
-  stateChanger: Dispatch<SetStateAction<Transcript[]>>;
+  transcriptsChanger: Dispatch<SetStateAction<Transcript[]>>;
 }) {
   const [name, setName] = React.useState('');
   const toast = useToast();
@@ -39,7 +39,7 @@ export function NewStudentForm({
               return;
             } else {
               const newStudentID = await addStudent(name);
-              stateChanger((prevValue: Transcript[]) => {
+              transcriptsChanger((prevValue: Transcript[]) => {
                 const newTranscripts = [
                   ...prevValue,
                   { student: { studentName: name, studentID: newStudentID }, grades: [] },

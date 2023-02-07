@@ -5,10 +5,10 @@ import { GradeView } from './GradeView';
 
 export function TranscriptView({
   transcript,
-  stateChanger,
+  transcriptsChanger,
 }: {
   transcript: Transcript;
-  stateChanger: Dispatch<SetStateAction<Transcript[]>>;
+  transcriptsChanger: Dispatch<SetStateAction<Transcript[]>>;
 }) {
   return (
     <ListItem>
@@ -23,7 +23,7 @@ export function TranscriptView({
             key={eachGradeIndex}
             grade={eachGrade}
             student={transcript.student}
-            stateChanger={stateChanger}
+            transcriptsChanger={transcriptsChanger}
           />
         ))}
       </HStack>

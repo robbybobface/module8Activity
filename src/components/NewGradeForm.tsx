@@ -24,9 +24,9 @@ interface INewGrade {
 }
 
 export function NewGradeForm({
-  stateChanger,
+  transcriptsChanger,
 }: {
-  stateChanger: Dispatch<SetStateAction<Transcript[]>>;
+  transcriptsChanger: Dispatch<SetStateAction<Transcript[]>>;
 }) {
   const [newGrade, setNewGrade] = useState<INewGrade>({
     course: '',
@@ -37,7 +37,7 @@ export function NewGradeForm({
 
   const addGradeHandler = async () => {
     await addGrade(parseInt(newGrade.studentID), newGrade.course, newGrade.grade);
-    stateChanger((prevValue: Transcript[]) => {
+    transcriptsChanger((prevValue: Transcript[]) => {
       const newTranscripts = prevValue.map((t: Transcript) => {
         if (t.student.studentID === parseInt(newGrade.studentID)) {
           console.log('found student');
@@ -86,7 +86,7 @@ export function NewGradeForm({
               placeholder='Select option'
               onChange={option => {
                 setNewGrade({ ...newGrade, course: option.target.value });
-                console.log(`Selected option`, option);
+                // console.log(`Selected option`, option);
               }}>
               {POSSIBLE_COURSES.map(currentCourse => (
                 <option value={currentCourse} key={currentCourse}>
@@ -100,7 +100,7 @@ export function NewGradeForm({
               placeholder='Student ID'
               onChange={e => {
                 setNewGrade({ ...newGrade, studentID: e.target.value });
-                console.log(`Added grade!`);
+                // console.log(`Added grade!`);
               }}
             />
           </Stack>
@@ -113,7 +113,7 @@ export function NewGradeForm({
             value={newGrade.grade}
             onChange={value => {
               setNewGrade({ ...newGrade, grade: parseInt(value) });
-              console.log('Changed! New value', value);
+              // console.log('Changed! New value', value);
             }}>
             <NumberInputField />
             <NumberInputStepper>

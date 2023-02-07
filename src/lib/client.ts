@@ -64,14 +64,18 @@ export async function getAllTranscripts(): Promise<Transcript[]> {
   return remoteGet<Transcript[]>('/transcripts');
 }
 
-// * PUT /transcripts -- Updates the transcript for a given student and course.
+/* PUT /transcripts/:studentID/:course  -- /transcripts
+-- Updates the transcript for a given student and course.
+-- Requires a post parameter 'grade'. Fails if there is no entry for this course in the student's transcript
+*/
+// (TODO: not working atm)
 export async function updateTranscripts(
   studentID: StudentID,
   course: Course,
-  newGrade: number,
+  grade: Grade,
 ): Promise<void> {
-  console.log(`Updating transcript for student ${studentID} in course ${course} to ${newGrade}`);
-  await remotePut<void>(`/transcripts/${studentID}/${course}`, { grade: newGrade });
+  console.log(`Updating transcript for student ${studentID} in course ${course} to ${grade}`);
+  await remotePut<void>(`/transcripts/${studentID}/${course}`, { grade });
 }
 
 export async function uploadTranscript(tr: Transcript): Promise<unknown> {
@@ -108,4 +112,5 @@ export const remoteTranscriptManager: Promisify<TranscriptManager> = {
   },
   addGrade: addGrade,
   getGrade: getGrade,
+  updateTranscript: updateTranscripts,
 };

@@ -9,6 +9,7 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { CourseGrade, Transcript } from '../types/transcript';
+import { updateTranscripts } from '../lib/client';
 
 export function GradeView({
   grade,
@@ -26,9 +27,12 @@ export function GradeView({
       <StatNumber>
         <Editable
           defaultValue={`${grade.grade}`}
-          onSubmit={newValue => {
+          onSubmit={async newValue => {
             // try {
-            // updateTranscripts(student.studentID, grade.course, parseInt(newValue));
+            // I tried creating a new endpoint for updating a single grade, but it didn't work.
+            // PUT requests to /api/transcripts/:studentID/:course/:grade didn't work.
+            // returns 404
+            await updateTranscripts(student.studentID, grade.course, parseInt(newValue));
             stateChanger((prevValue: Transcript[]) => {
               const newTranscripts = prevValue.map((t: Transcript) => {
                 if (t.student.studentID === student.studentID) {

@@ -46,6 +46,8 @@ export interface TranscriptManager {
    */
   addGrade(studentID: StudentID, course: Course, grade: Grade): void;
 
+  updateTranscript(studentID: StudentID, course: Course, grade: Grade): void;
+
   /**
    * Get the grade for this student in this course.
    * Result is undefined if the student is not in the system or if

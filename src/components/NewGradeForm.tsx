@@ -15,6 +15,7 @@ import {
 } from '@chakra-ui/react';
 import { POSSIBLE_COURSES } from '../types/gentrans';
 import { Transcript } from '../types/transcript';
+import { addGrade } from '../lib/client';
 
 interface INewGrade {
   course: string;
@@ -34,7 +35,8 @@ export function NewGradeForm({
   });
   const toast = useToast();
 
-  const addGradeHandler = () => {
+  const addGradeHandler = async () => {
+    await addGrade(parseInt(newGrade.studentID), newGrade.course, newGrade.grade);
     stateChanger((prevValue: Transcript[]) => {
       const newTranscripts = prevValue.map((t: Transcript) => {
         if (t.student.studentID === parseInt(newGrade.studentID)) {

@@ -136,6 +136,13 @@ export const transcriptManager: TranscriptManager = {
       return undefined;
     }
   },
+  updateTranscript: function (studentID: number, course: string, grade: number): void {
+    try {
+      return updateTranscripts(studentID, course, grade);
+    } catch {
+      return undefined;
+    }
+  },
 };
 
 export function initialize() {

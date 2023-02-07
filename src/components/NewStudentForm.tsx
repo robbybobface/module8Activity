@@ -1,6 +1,7 @@
 import React, { Dispatch, SetStateAction } from 'react';
 import { GridItem, Tag, Stack, Input, Button, useToast } from '@chakra-ui/react';
 import { Transcript } from '../types/transcript';
+import { addStudent } from '../lib/client';
 
 export function NewStudentForm({
   stateChanger,
@@ -9,15 +10,6 @@ export function NewStudentForm({
 }) {
   const [name, setName] = React.useState('');
   const toast = useToast();
-  const sortByID = (a: Transcript, b: Transcript, orderType: boolean) => {
-    if (a.student.studentID < b.student.studentID) {
-      return orderType ? -1 : 1;
-    }
-    if (a.student.studentID > b.student.studentID) {
-      return orderType ? 1 : -1;
-    }
-    return 0;
-  };
   return (
     <GridItem w='100%' h='100%' colSpan={1}>
       <div>
@@ -35,7 +27,7 @@ export function NewStudentForm({
         <br />
         <Button
           colorScheme='green'
-          onClick={() => {
+          onClick={async () => {
             if (name === '') {
               toast({
                 title: 'No name entered.',
@@ -46,13 +38,11 @@ export function NewStudentForm({
               });
               return;
             } else {
+              const newStudentID = await addStudent(name);
               stateChanger((prevValue: Transcript[]) => {
-                const lastIndex = [...prevValue].sort((a, b) => sortByID(a, b, true)).slice(-1)[0]
-                  .student.studentID;
-                // console.log(lastIndex);
                 const newTranscripts = [
                   ...prevValue,
-                  { student: { studentName: name, studentID: lastIndex + 1 }, grades: [] },
+                  { student: { studentName: name, studentID: newStudentID }, grades: [] },
                 ];
                 return [...newTranscripts];
               });
